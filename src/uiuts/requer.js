@@ -9,7 +9,8 @@ const Server = axios.create({
 
 //3. 请求拦截器配置
 Server.interceptors.request.use((config)=>{
-    return config;
+    // config.headers.Authorization = window.sessionStorage.getItem("token")
+    return config
 },(error)=>{
     return Promise.reject(error);
 });
