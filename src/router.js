@@ -37,6 +37,11 @@ export default new Router({
           name:"roles",
           component:()=>import('@/views/roles'),
         },
+        {
+          path:"/rights",
+          name:"rights",
+          component:()=>import('@/views/rights'),
+        },
   
       ]
     },

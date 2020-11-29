@@ -61,6 +61,7 @@
             <el-button
               type="warning"
               icon="el-icon-star-off"
+              @click="setRole(scope.row)"
               circle
             ></el-button>
             <el-button
@@ -91,8 +92,8 @@
     <el-dialog
       title="提示"
       :visible.sync="dialogVisible"
-      @close="addDialog"
-      width="30%"
+    
+      width="50%"
     >
       <el-form ref="from" :rules="rules" :model="addFrom" label-width="80px">
         <el-form-item label="用户名" prop="username">
@@ -134,6 +135,34 @@
         <el-button type="primary" @click="addEdit">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!--添加权限对话框-->
+    <el-dialog
+  title="分配角色"
+  :visible.sync="dialog"
+  width="30%"
+  @close="seclose">
+  
+  <div>
+    <p>当前用户:{{userInfo.username}}</p>
+    <p>当前角色:{{userInfo.role_name}}</p>
+    <p>分配新角色：
+    <el-select v-model="selectId" placeholder="请选择">
+    <el-option
+      v-for="item in rolesList"
+      :key="item.id"
+      :label="item.roleName"
+      :value="item.id">
+    </el-option>
+  </el-select>
+    </p>
+  </div>
+
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="dialog = false">取 消</el-button>
+    <el-button type="primary" @click="saveInfo">确 定</el-button>
+  </span>
+</el-dialog>
   </div>
 </template>
 
@@ -177,7 +206,7 @@ export default {
       userList: [],
       total: 0,
       value: true,
-      dialogVisible: false,
+      dialog: false,
       //  验证规则
       rules: {
         username: [
@@ -220,6 +249,15 @@ export default {
         password: "",
       },
       flag: false,
+      // 控制分配角色对话框显示与隐藏
+      dialogVisible:false,
+      // 需要被分配角色
+      userInfo:{},
+      // 所有角色的数据列表
+       rolesList:[],
+      
+      selectId:""
+       
     };
   },
   // 计算属性
@@ -350,6 +388,38 @@ export default {
       this.$message.success(res.meta.msg);
       this.getuser();
     },
+    // 展示分配角色
+   async setRole(userInfo){
+      this.userInfo=userInfo
+      // 获取角色列表
+    const {data:res}= await this.$axios.get('roles')
+    if(res.meta.status!==200){
+      return this.$message.error('获取角色列表失败')
+    }
+    this.rolesList=res.data
+    console.log(this.rolesList)
+      this.dialog=true
+    },
+    // 点击按钮分配角色
+   async saveInfo(){
+      if(!this.selectId){
+        return this.$message.error('请选择要分配的角色！')
+      }
+
+   const {data:res}= await this.$axios.put(`users/${this.userInfo.id}/role`,
+      {rid:this.selectId})
+      if(res.meta.status!==200){
+        return this.$message.error('更新角色失败')
+      }
+      this.$message.success('更新角色成功')
+      this.getuser()
+      this.dialog = false
+    },
+    // 监听分配关闭事件
+    seclose(){
+        this.selectId=""
+        this.userInfo=[]
+    }
   },
   // 以下是生命周期钩子   注：没用到的钩子请自行删除
   /**

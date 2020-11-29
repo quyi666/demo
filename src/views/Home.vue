@@ -190,7 +190,6 @@ export default {
   .el-aside {
     background-color: #D3DCE6;
     color: #333;
-    text-align: center;
     height: 693px;
     .el-menu{
       border-right: none;
@@ -200,7 +199,7 @@ export default {
   .el-main {
     background-color: #E9EEF3;
     color: #333;
-    text-align: center;
+   
     
   }
   
